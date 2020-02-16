@@ -23,17 +23,20 @@ You will be able to install the released version of metabor from
 install.packages("metabor")
 ```
 
-For now, you can install the development version with:
+Install the development version from GitHub:
 
 ``` r
+# install.packages("devtools")
 devtools::install_github("yajiez/metabor")
 ```
 
-## Example
+## Usage
 
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(metabor)
+#> ✓ Welcome to the metabor package.
+#> 
 ## basic example code
 ```
