@@ -1,13 +1,13 @@
 Package: metabor
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Metabolic Data Analysis in R
+Version: 0.0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Yajie",
+           family = "Zhu",
            role = c("aut", "cre"),
            email = "first.last@example.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: Metabolic Data Analysis in R.
 License: GPL-3
 Suggests: 
     testthat
