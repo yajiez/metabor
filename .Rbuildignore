@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^metabor\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
