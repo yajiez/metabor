@@ -3,5 +3,8 @@
 export(bad)
 export(good)
 export(note)
+export(show_stats)
+export(show_stats_by_group)
+export(show_stats_by_group_strata)
 export(todo)
 export(warn)
