@@ -1,4 +1,4 @@
-desctats <- function(x, name = NULL, digits = 3, use_percent = F, max_levels = 6, dropna = F) {
+desctats <- function(x, name = NULL, digits = 3, use_percent = T, percentStr=T, max_levels = 6, dropna = T) {
   if (is.character(x)) {
     x <- as_factor(x)
   }
@@ -11,7 +11,27 @@ desctats <- function(x, name = NULL, digits = 3, use_percent = F, max_levels = 6
     mean_val <- round(mean(x, na.rm = T), digits = digits)
     sd_val <- round(sd(x, na.rm = T), digits = digits)
     return(as.character(glue::glue("{format(mean_val, nsmall = digits)} ({format(sd_val, nsmall = digits)})")))
-  } else if (is.factor(x)) {
+  } else if (is.logical(x)) {
+    n_cases <- sum(x, na.rm = T)
+    if (use_percent) {
+      if (dropna) {
+        warn(glue::glue("Samples contains missing values for {name} were dropped before the calculation."))
+        percent <- round(mean(x, na.rm = T), digits = digits)
+      } else {
+        warn(glue::glue("Samples contains missing values for {name} were counted in the denominator."))
+        percent <- round(n_cases / length(x), digits = digits)
+      }
+      if (percentStr) {
+        return(as.character(glue::glue("{format(round(percent * 100, digits = digits - 2), nsmall = digits - 2)}%")))
+      } else {
+        return(as.character(round(percent * 100, digits = digits - 2)))
+      }
+    } else {
+      return(n_cases)
+    }
+
+  }
+  else if (is.factor(x)) {
     if (dropna) {
       x <- na.omit(x)
     }
@@ -22,7 +42,7 @@ desctats <- function(x, name = NULL, digits = 3, use_percent = F, max_levels = 6
     } else {
       if (use_percent) {
         destr <- forcats::fct_count(x, prop = T) %>% mutate(
-          destr = glue::glue_col("{f}:{round(p * 100)}%"))
+          destr = glue::glue_col("{f}:{round(p * 100, digits = digits - 2)}%"))
       } else {
         destr <- forcats::fct_count(x) %>% mutate(destr = glue::glue_col("{f}: {n}"))
       }
@@ -37,7 +57,7 @@ desctats <- function(x, name = NULL, digits = 3, use_percent = F, max_levels = 6
 
 #' Show statistics for all the columns of a data frame
 #' @export
-show_stats <- function(df, digits = 3, use_percent = F, max_levels = 6, dropna = F) {
+show_stats <- function(df, digits = 3, use_percent = T, max_levels = 6, dropna = T) {
   stat <- df %>%
     purrr::map2_dfc(., colnames(.), desctats,
                     digits = digits,
@@ -54,7 +74,7 @@ show_stats <- function(df, digits = 3, use_percent = F, max_levels = 6, dropna =
 
 #' Show statistics for all the columns of a data frame group by the group_var
 #' @export
-show_stats_by_group <- function(df, group_var, digits = 3, use_percent = F, max_levels = 6, dropna = F) {
+show_stats_by_group <- function(df, group_var, digits = 3, use_percent = F, max_levels = 6, dropna = T) {
   df %>% group_by(!!enquo(group_var)) %>% nest() %>%
     mutate(stats = map(data, show_stats, digits, use_percent, max_levels, dropna)) %>%
     arrange(!!enquo(group_var)) %>% select(-data) %>%
@@ -67,7 +87,7 @@ show_stats_by_group <- function(df, group_var, digits = 3, use_percent = F, max_
 
 #' Show statistics for all the columns of a data frame group by group_var and stratify by strata
 #' @export
-show_stats_by_group_strata <- function(df, group_var, strata, digits = 3, use_percent = F, max_levels = 6, dropna = F) {
+show_stats_by_group_strata <- function(df, group_var, strata, digits = 3, use_percent = T, max_levels = 6, dropna = T) {
   note(glue::glue("Group by {dplyr::quo_name(enquo(group_var))} and strata by {dplyr::quo_name(enquo(strata))}."))
   stratum <- unique(df[[dplyr::quo_name(enquo(strata))]])
   dfs <- list()
